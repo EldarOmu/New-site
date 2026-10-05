@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Доска объявлений</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #eef1ec;
+    --surface: #ffffff;
+    --ink: #17302b;
+    --muted: #5d6f6a;
+    --line: #cfd8d3;
+    --accent: #e8a317;
+    --accent-ink: #3a2800;
+    --danger: #b3261e;
+    --ok: #1f6f4a;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #11201d;
+      --surface: #1a2e2a;
+      --ink: #e8f0ec;
+      --muted: #9fb3ac;
+      --line: #2e4540;
+      --danger: #ff8a80;
+      --ok: #7fd6a8;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: "Onest", system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    line-height: 1.5;
+  }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 32px 20px 64px; }
+  h1 { font-size: clamp(2rem, 5vw, 3.2rem); font-weight: 800; letter-spacing: -0.03em; margin: 0 0 24px; }
+  h2 { font-size: 1.25rem; margin: 0 0 16px; }
+
+  .layout { display: grid; grid-template-columns: 320px 1fr; gap: 28px; align-items: start; }
+  @media (max-width: 820px) { .layout { grid-template-columns: 1fr; } }
+
+  form {
+    background: var(--surface);
+    border: 2px solid var(--ink);
+    border-radius: 6px;
+    padding: 20px;
+    position: sticky; top: 20px;
+  }
+  @media (max-width: 820px) { form { position: static; } }
+  label { display: block; font-size: .9rem; font-weight: 500; margin-bottom: 14px; }
+  input, textarea {
+    display: block; width: 100%; margin-top: 4px;
+    font: inherit; color: var(--ink);
+    background: var(--bg);
+    border: 1px solid var(--line); border-radius: 4px;
+    padding: 9px 10px;
+  }
+  textarea { min-height: 90px; resize: vertical; }
+  input:focus-visible, textarea:focus-visible, button:focus-visible {
+    outline: 3px solid var(--accent); outline-offset: 1px;
+  }
+  #preview { display: none; width: 100%; max-height: 180px; object-fit: cover; border-radius: 4px; margin: 0 0 14px; }
+  button {
+    font: inherit; font-weight: 700; cursor: pointer;
+    background: var(--accent); color: var(--accent-ink);
+    border: 2px solid var(--ink); border-radius: 4px;
+    padding: 10px 16px; width: 100%;
+  }
+  button:disabled { opacity: .6; cursor: wait; }
+  .status { margin: 12px 0 0; font-size: .9rem; min-height: 1.3em; }
+  .status.err { color: var(--danger); }
+  .status.ok { color: var(--ok); }
+
+  .head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 16px; }
+  .head span { color: var(--muted); font-size: .9rem; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 18px; }
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    overflow: hidden;
+    display: flex; flex-direction: column;
+  }
+  .card .pic { aspect-ratio: 4 / 3; background: var(--line); display: grid; place-items: center; color: var(--muted); font-size: .85rem; }
+  .card .pic img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .card .body { padding: 14px; display: flex; flex-direction: column; gap: 6px; flex: 1; }
+  .card h3 { margin: 0; font-size: 1.05rem; }
+  .card p { margin: 0; color: var(--muted); font-size: .92rem; overflow-wrap: anywhere; }
+  .card .price { margin-top: auto; font-weight: 800; font-size: 1.15rem; }
+  .empty { color: var(--muted); padding: 32px 0; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Доска объявлений</h1>
+
+  <div class="layout">
+    <form id="adForm">
+      <h2>Подать объявление</h2>
+      <img id="preview" alt="Предпросмотр изображения">
+      <label>Заголовок
+        <input name="title" required maxlength="120">
+      </label>
+      <label>Описание
+        <textarea name="description" required></textarea>
+      </label>
+      <label>Цена
+        <input name="price" type="number" step="0.01" min="0" required>
+      </label>
+      <label>Изображение
+        <input name="image" type="file" accept="image/*" required>
+      </label>
+      <button type="submit" id="submitBtn">Опубликовать</button>
+      <p class="status" id="formStatus" role="status"></p>
+    </form>
+
+    <section>
+      <div class="head">
+        <h2>Объявления</h2>
+        <span id="total"></span>
+      </div>
+      <div id="list" class="grid" aria-live="polite"></div>
+      <p id="listStatus" class="status"></p>
+    </section>
+  </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
